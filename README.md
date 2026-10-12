@@ -45,3 +45,10 @@ The trade-off: you lose the inline prose that explains *why* one exception led t
 - **Cycles are guarded.** If `__cause__` or `__context__` links form a cycle (only possible through manual assignment, since normal raising cannot create one), each exception appears at most once and the walk terminates.
 - **No traceback → empty `tb` field.** An exception that was constructed but never raised (or whose `__traceback__` was cleared) yields `tb == ""` rather than a synthetic header.
 - **`exc_type` is the class object, not a name string.** This lets callers do `isinstance` or subclass checks, at the cost of not being JSON-serialisable as-is.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
